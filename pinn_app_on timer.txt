@@ -1,0 +1,343 @@
+var_imx-android-13.0.0_1.0.0/android_build/device/variscite/imx8m/dart_mx8mm/ankit_service/AndroidAnkit.mk
+PRODUCT_PACKAGES += \
+                    timertest \
+                    device_owner \
+                    privapp_timer
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.sys.locktask_whitelist=com.customservice.timer \
+    persist.sys.locktask_blacklist=* 
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/core/java/com/android/server/lock/LockService.java
+package com.android.server.lock;
+
+import android.app.lock.ILockService;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.RemoteException;
+import android.util.Log;
+import android.widget.Toast;
+import android.content.Intent;
+import android.os.UserHandle;
+import android.app.StatusBarManager;
+
+import android.app.admin.DevicePolicyManager;
+import android.app.ActivityManager;
+import android.app.ActivityTaskManager;
+import android.content.pm.PackageManager;
+import android.app.IActivityTaskManager;
+import android.content.ComponentName;
+import android.os.SystemProperties;
+
+public class LockService extends ILockService.Stub {
+    private static final String TAG = "AnkitLockService";
+    private static final String ACTION_LOCK_STATE_CHANGED = "com.customservice.timer.ACTION_LOCK_STATE_CHANGED";
+    private static final String EXTRA_LOCKED = "locked";
+    private static final String PERMISSION_RECEIVE_LOCK_STATE = "com.customservice.timer.permission.RECEIVE_LOCK_STATE";
+
+
+    private final Context mContext;
+    private boolean mLocked = false;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private DevicePolicyManager mDpm;
+    private ComponentName mAdminComponent;
+    
+    public LockService(Context context) {
+        mContext = context;
+    }
+
+    @Override
+    public void setLockState(boolean locked) {
+        mLocked = locked;
+        Log.d(TAG, "Lock state changed to: " + locked);
+        Log.i(TAG,"Control status bar");
+        
+        // Get StatusBarManager once
+        StatusBarManager statusBar = (StatusBarManager) mContext.getSystemService(Context.STATUS_BAR_SERVICE);
+        if (statusBar == null) {
+            Log.e(TAG, "StatusBarManager not available");
+            return;
+        }
+
+        if (locked) {
+            Log.i(TAG, "Lock state Disable status bar expansion");
+            statusBar.disable(StatusBarManager.DISABLE_EXPAND 
+                | StatusBarManager.DISABLE_NOTIFICATION_ICONS
+                | StatusBarManager.DISABLE_CLOCK
+                | StatusBarManager.DISABLE_SYSTEM_INFO);
+        } else {
+            Log.i(TAG, "Re-enable status bar");
+            statusBar.disable(StatusBarManager.DISABLE_NONE);
+        }
+
+        // Handle LockTask
+        if (locked) {
+            Log.i(TAG, "Lock Task if startLockTask statement check ");
+            startLockTask();
+        } else {
+            Log.i(TAG, "Lock Task if stopLockTask statement check ");
+            stopLockTask();
+        }
+
+        // broadcast intent 
+        Intent intent = new Intent(ACTION_LOCK_STATE_CHANGED);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        intent.putExtra(EXTRA_LOCKED, locked);
+        // mContext.sendBroadcastAsUser(intent, UserHandle.SYSTEM, 
+        //     "com.customservice.timer.permission.RECEIVE_LOCK_STATE");      
+        // mContext.sendBroadcastAsUser(intent, 
+        // UserHandle.SYSTEM, 
+        // "com.customservice.timer.permission.RECEIVE_LOCK_STATE");
+        mContext.sendBroadcastAsUser(intent, UserHandle.SYSTEM, PERMISSION_RECEIVE_LOCK_STATE); // Use the permission string directly
+        }
+
+    @Override
+    public boolean isLocked() {
+        return mLocked;
+    }
+
+    private void startLockTask() {
+        try {
+            ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_LOCKED) {
+                Log.i(TAG, "getLockTaskModeState");
+                return;
+            }
+
+             // Add device owner check first
+            if (!mDpm.isDeviceOwnerApp(mAdminComponent.getPackageName())) {
+                Log.e(TAG, "Not device owner - cannot start LockTask");
+                return;
+            }
+
+            // Verify admin activation
+            if (!mDpm.isAdminActive(mAdminComponent)) {
+                Log.e(TAG, "Admin component not active");
+                return;
+            }
+
+            mContext.enforceCallingOrSelfPermission(
+                "android.permission.MANAGE_DEVICE_ADMINS", 
+                "LockTask permission required"
+            );
+
+            mDpm = (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            mAdminComponent = new ComponentName("com.customservice.timer", 
+                "com.customservice.timer.LockAdminReceiver");
+
+            if (!mDpm.isAdminActive(mAdminComponent)) {
+                Log.e(TAG, "Admin component not active");
+                return;
+            }
+
+            // Set LockTask packages
+            mDpm.setLockTaskPackages(mAdminComponent, new String[]{"com.customservice.timer"});
+
+            // Start LockTask
+            ActivityTaskManager.getService().startSystemLockTaskMode(
+                UserHandle.myUserId()
+            );
+
+            // Hide navigation bar
+            SystemProperties.set("qemu.hw.mainkeys", "1");
+            } catch (Exception e) {
+                Log.e(TAG, "LockTask failed", e);
+        }
+    }
+
+    private void stopLockTask() {
+        try {
+            ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am.getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE) {
+                final IActivityTaskManager atm = ActivityTaskManager.getService();
+                atm.stopSystemLockTaskMode();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to stop LockTask", e);
+        }
+    }
+
+    @Override
+    public void showLockMessage(String message) {
+        mHandler.post(() -> {
+            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+        });
+    }
+}
+
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/core/java/android/app/lock/ILockService.aidl
+package android.app.lock;
+/**
+ * System private API for communicating with the Lock Service.
+ * {@hide}
+ */
+interface ILockService {
+    void setLockState(boolean locked);
+    boolean isLocked();
+    void showLockMessage(String message);
+}
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/core/java/android/app/lock/LockServiceManager.java
+package android.app.lock;
+
+import android.annotation.SystemService;
+import android.content.Context;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
+
+/** @hide */
+@SystemService(Context.LOCK_SERVICE)
+public class LockServiceManager {
+    private static final String TAG = "AnkitLockServiceManager";
+    private final Context mContext;
+    private final ILockService mService;
+
+    /** @hide */
+    public LockServiceManager(Context context, ILockService service) {
+        mContext = context;
+        mService = service;
+    }
+
+    /** @hide */
+    public void setLockState(boolean locked) {
+        try {
+            Log.i(TAG,"from lock service Manager!");
+            mService.setLockState(locked);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Failed to set Ankit lock state", e);
+        }
+    }
+
+    /** @hide */
+    public boolean isLocked() {
+        try {
+            Log.i(TAG,"from lock service Manager!");
+            return mService.isLocked();
+        } catch (RemoteException e) {
+            Log.e(TAG, "Failed to check Ankit lock state", e);
+            return false;
+        }
+    }
+
+    /** @hide */
+    public void showLockMessage(String message) {
+        try {
+            Log.i(TAG,"from lock service Manager!");
+            mService.showLockMessage(message);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Failed to show Ankit lock message", e);
+        }
+    }
+}
+
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/core/java/android/content/Context.java
+    /**
+    * @hide
+    */
+    public static final String LOCK_SERVICE = "lock_service";
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/services/java/com/android/server/SystemServer.java
+import com.android.server.lock.LockService;
+            t.traceBegin("LockService");
+            try {
+                Slog.i(TAG, "Starting Ankit lock service");
+                // LockService lockService = new LockService(context);
+                ServiceManager.addService("lock_service", new LockService(context));
+                Slog.i(TAG, "Ankit LockService Started");
+            } catch (Throwable e) {
+                Slog.e(TAG, "Failure Ankit starting lock Service", e);
+                reportWtf("starting LockService", e);
+            }
+            t.traceEnd();
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/core/java/android/app/SystemServiceRegistry.java
+import android.app.lock.LockServiceManager;
+import android.app.lock.ILockService;
+        registerService(
+            Context.LOCK_SERVICE, // The constant you added to Context.java
+            LockServiceManager.class,
+            new CachedServiceFetcher<LockServiceManager>() {
+                @Override
+                public LockServiceManager createService(ContextImpl ctx) {
+                    IBinder b = ServiceManager.getService(Context.LOCK_SERVICE);
+                    ILockService service = ILockService.Stub.asInterface(b);
+                    return new LockServiceManager(ctx.getOuterContext(), service);
+                }
+            }
+        );
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/services/core/java/com/android/server/statusbar/StatusBarManagerService.java
+    public void disableStatusBar() {
+        enforceStatusBarPermission();
+        // Logic to hide the status bar
+        mBarService.disable(StatusBarManager.DISABLE_EXPAND);
+    }
+
+
+var_imx-android-13.0.0_1.0.0/android_build/frameworks/base/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarController.java
+import com.android.systemui.navigationbar.NavigationBar;
+import com.android.systemui.navigationbar.NavigationBarView;
+
+    public void setNavigationLocked(boolean locked) {
+        if (mNavigationBars == null) {
+            Log.i(TAG, "setNavigationLocked.");
+            return;
+        }
+
+        NavigationBarView mNavigationBarView = getCurrentNavigationBarView();
+        if (mNavigationBarView != null) {
+            mNavigationBarView.setVisibility(locked ? View.GONE : View.VISIBLE);
+            // Use setClickable instead of OnTouchListener
+            mNavigationBarView.setClickable(!locked);
+            mNavigationBarView.setFocusable(!locked);
+        }
+    }
+
+
+    private NavigationBarView getCurrentNavigationBarView() {
+        for (int i = 0; i < mNavigationBars.size(); i++) {
+            NavigationBar navBar = mNavigationBars.valueAt(i);
+            if (navBar != null) {
+                return navBar.getView();
+            }
+        }
+        return null;
+    }
+    
+
+
+var_imx-android-13.0.0_1.0.0/android_build/device/variscite/imx8m/dart_mx8mm/ankit_service/sepolicy/lock_service.te
+# Allow service to interact with system_server
+allow lock_service system_server:service_manager { add };
+allow lock_service system_server:binder { call transfer };
+
+# Allow status bar control
+allow lock_service status_bar_service:service_manager find;
+allow lock_service activity_service:service_manager { add };
+
+allow lock_service device_policy_service:service_manager find;
+allow lock_service system_server:service_manager add;
+allow lock_service system_app:file { read write };
+
+allow lock_service system_server:binder { call transfer };
+allow lock_service system_app:service_manager add;
+
+# Allow LockTask operations
+allow lock_service activity_task_service:service_manager find;
+allow lock_service system_server:activity_manager { start_activity };
+
+# In lock_service.te
+allow lock_service activity_service:service_manager { add find };
+allow lock_service device_policy_service:service_manager { add find };

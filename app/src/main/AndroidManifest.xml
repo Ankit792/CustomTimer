@@ -7,7 +7,7 @@
 
     <!-- <permission android:name="android.permission.MANAGE_DEVICE_LOCK_STATE" /> -->
     <!-- <uses-permission android:name="com.example.permission.MATH_SERVICE" /> -->
-    <permission android:name="com.astro.timertest.permission.RECEIVE_LOCK_STATE"
+    <permission android:name="com.customservice.timer.permission.RECEIVE_LOCK_STATE"
         android:protectionLevel="signature|system" />
 
     <!-- Ensure proper permissions -->
@@ -43,5 +43,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".LockStateReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.customservice.timer.permission.RECEIVE_LOCK_STATE">
+            <intent-filter>
+                <action android:name="com.customservice.timer.ACTION_LOCK_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".LockAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>

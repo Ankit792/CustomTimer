@@ -16,7 +16,7 @@ import android.app.lock.LockServiceManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Intent;
-import com.astro.timertest.utils.NavigationUtils;
+import com.customservice.timer.utils.NavigationUtils;
 
 import android.os.IBinder;  // For IBinder class
 import android.os.ServiceManager;  // For ServiceManager class
