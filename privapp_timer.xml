@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.customservice.timer">
+        <permission name="android.permission.MANAGE_DEVICE_ADMINS"/>
+        <permission name="android.permission.UPDATE_LOCK_TASK_PACKAGES"/>
+        <permission name="android.permission.CONTROL_DEVICE_STATE"/>
+        <permission name="android.permission.BIND_DEVICE_ADMIN"/>
+        <permission name="android.permission.START_LOCK_TASK_MODE_FROM_APP"/>
+    </privapp-permissions>
+</permissions>

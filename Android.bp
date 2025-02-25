@@ -1,0 +1,55 @@
+
+android_app {
+  name: "timertest",
+  certificate: "platform",
+  
+  platform_apis: true,
+  privileged: true,
+
+  srcs: ["app/src/main/java/**/*.java"],
+  
+  resource_dirs: ["app/src/main/res"],
+  manifest: "app/src/main/AndroidManifest.xml",
+
+  overrides: ["Provision"],
+
+  static_libs: [
+    "com.google.android.material_material",
+    "androidx.core_core",
+    "androidx.preference_preference",
+    "androidx.lifecycle_lifecycle-extensions",
+    "androidx-constraintlayout_constraintlayout",
+    "androidx.annotation_annotation",
+    "androidx.appcompat_appcompat",
+  ],
+
+//    aidl: {
+//      local_include_dirs: ["app/src/main/aidl"], 
+//    },
+
+  libs: [
+    "framework",
+  ],
+  required: [
+      "privapp_timer",
+      "device_owner"
+    ],
+}
+
+
+prebuilt_etc {
+    name: "privapp_timer",
+    //system_ext_specific: true,
+    src: "privapp_timer.xml",
+    sub_dir: "permissions",
+    filename_from_src: true,
+}
+
+
+prebuilt_etc {
+    name: "device_owner",
+    sub_dir: "",
+    src: "device_owner.xml",
+    filename_from_src: true,
+    installable: true, 
+}
