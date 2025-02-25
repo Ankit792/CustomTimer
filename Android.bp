@@ -1,6 +1,6 @@
 
 android_app {
-  name: "timertest",
+  name: "CustomTimerPin",
   certificate: "platform",
   
   platform_apis: true,

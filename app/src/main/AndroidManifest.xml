@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.customservice.timer">
+    package="com.customservice.timer"
+    android:versionCode="5"
+    android:sharedUserId="android.uid.system">
+
+    <!-- <permission android:name="android.permission.MANAGE_DEVICE_LOCK_STATE" /> -->
+    <!-- <uses-permission android:name="com.example.permission.MATH_SERVICE" /> -->
+    <permission android:name="com.astro.timertest.permission.RECEIVE_LOCK_STATE"
+        android:protectionLevel="signature|system" />
+
+    <!-- Ensure proper permissions -->
+    <!-- <uses-permission android:name="android.permission.UPDATE_LOCK_TASK_PACKAGES" /> -->
+    <!-- <uses-permission android:name="android.permission.CONTROL_DISPLAY_COLOR_TRANSFORMS" /> -->
+
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_ADMINS" />
+    <!--<uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MANAGERS" />
+    <uses-permission android:name="android.permission.DISPATCH_PROVISIONING_MESSAGE" /> -->
+
+    <uses-permission android:name="android.permission.UPDATE_LOCK_TASK_PACKAGES" />
+    <uses-permission android:name="android.permission.CONTROL_DEVICE_STATE" />
+
+    <!-- <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+    tools:ignore="ProtectedPermissions" /> -->
+
 
     <application
         android:allowBackup="true"
