@@ -1,7 +1,6 @@
 package com.customservice.timer;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -10,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.app.math.MathServiceManager;
+import android.util.Log;
+import android.content.Context;
+import android.os.RemoteException;
 
 public class MainActivity extends AppCompatActivity {
     TextView textView;
@@ -18,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer countDownTimer;
     TextView textView2;
     MediaPlayer mediaPlayer;
+    private MathServiceManager mathService;
+    private static final String TAG = "AnkitApp";
 
     Boolean timerActive = false;
 
@@ -33,8 +38,15 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         textView2 = findViewById(R.id.textView2);
 
-        button.setOnClickListener(this::startTimer); // Attach startTimer to the button
+        mathService = (MathServiceManager) getSystemService(Context.MATH_SERVICE);
+
+        if (mathService == null) {
+            Log.e("AnkitApp", "Failed to retrieve MathService!");
+        } else {
+            Log.d("AnkitApp", "MathService successfully connected!");
+        }
     }
+
 
     public void resetTimer() {
         editTextHours.setEnabled(true);
@@ -43,12 +55,11 @@ public class MainActivity extends AppCompatActivity {
         updateTimer(0);
         button.setText("Start");
         timerActive = false;
-
+        // Check if countDownTimer is already running
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
 
-        // Play alert sound when timer ends
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alert);
         mediaPlayer.start();
     }
@@ -93,8 +104,17 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     textView2.setText("Time Up");
+                    if (mathService != null) {
+
+                        int result = mathService.add(5, 10);
+                        Log.d("AnkitApp", "Result of addition: " + result);
+
+                    } else {
+                        Log.e("AnkitApp", "MathService is not accessible!");
+                    }
                     resetTimer();
                 }
+
             };
             countDownTimer.start();
         }
