@@ -1,75 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-<Button
-    android:id="@+id/button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="164dp"
-    android:layout_marginLeft="164dp"
-    android:layout_marginTop="418dp"
-    android:layout_marginEnd="159dp"
-    android:layout_marginRight="159dp"
-    android:layout_marginBottom="265dp"
-    android:onClick="startTimer"
-    android:text="Start"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="164dp"
+        android:layout_marginLeft="164dp"
+        android:layout_marginTop="418dp"
+        android:layout_marginEnd="159dp"
+        android:layout_marginRight="159dp"
+        android:layout_marginBottom="265dp"
+        android:onClick="startTimer"
+        android:text="Start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-<SeekBar
-    android:id="@+id/seekBar"
-    android:layout_width="369dp"
-    android:layout_height="56dp"
-    android:layout_marginStart="175dp"
-    android:layout_marginLeft="175dp"
-    android:layout_marginTop="93dp"
-    android:layout_marginEnd="195dp"
-    android:layout_marginRight="195dp"
-    android:layout_marginBottom="307dp"
-    app:layout_constraintBottom_toTopOf="@+id/button"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <EditText
+        android:id="@+id/editTextSeconds"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#00BCD4"
+        android:ems="10"
+        android:hint="00"
+        android:inputType="number"
+        android:textSize="36sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView3" />
 
-<TextView
-    android:id="@+id/textView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="175dp"
-    android:layout_marginLeft="175dp"
-    android:layout_marginTop="110dp"
-    android:layout_marginEnd="177dp"
-    android:layout_marginRight="177dp"
-    android:layout_marginBottom="159dp"
-    android:text="Timer"
-    android:textSize="36sp"
-    app:layout_constraintBottom_toTopOf="@+id/button"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="8dp"
+        android:layout_height="60dp"
+        android:text=":"
+        android:textColor="#000000"
+        android:textSize="36sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/editTextHours"
+        app:layout_constraintEnd_toStartOf="@+id/editTextMinutes"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/editTextHours" />
 
-<TextView
-    android:id="@+id/textView2"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="173dp"
-    android:layout_marginLeft="173dp"
-    android:layout_marginTop="71dp"
-    android:layout_marginEnd="179dp"
-    android:layout_marginRight="179dp"
-    android:layout_marginBottom="54dp"
-    android:textColor="#E32F2F"
-    android:textSize="24sp"
-    app:layout_constraintBottom_toTopOf="@+id/button"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/textView" />
+    <EditText
+        android:id="@+id/editTextMinutes"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#00BCD4"
+        android:ems="10"
+        android:hint="00"
+        android:inputType="number"
+        android:textSize="36sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/textView3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView4" />
+
+    <EditText
+        android:id="@+id/editTextHours"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#00BCD4"
+        android:ems="10"
+        android:hint="00"
+        android:inputType="number"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="8dp"
+        android:layout_height="60dp"
+        android:text=":"
+        android:textColor="#020101"
+        android:textSize="36sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/editTextMinutes"
+        app:layout_constraintEnd_toStartOf="@+id/editTextSeconds"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/editTextMinutes" />
+
+    <!-- Timer Display -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="175dp"
+        android:layout_marginLeft="175dp"
+        android:layout_marginTop="110dp"
+        android:layout_marginEnd="177dp"
+        android:layout_marginRight="177dp"
+        android:layout_marginBottom="159dp"
+        android:text="Timer"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextMinutes" />
+
+    <!-- Time Up Text -->
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginLeft="173dp"
+        android:layout_marginTop="71dp"
+        android:layout_marginEnd="179dp"
+        android:layout_marginRight="179dp"
+        android:layout_marginBottom="54dp"
+        android:textColor="#E32F2F"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

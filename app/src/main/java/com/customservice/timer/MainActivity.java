@@ -1,124 +1,113 @@
 package com.customservice.timer;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.SeekBar;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     TextView textView;
-    SeekBar seekBar;
+    EditText editTextHours, editTextMinutes, editTextSeconds;
     Button button;
     CountDownTimer countDownTimer;
     TextView textView2;
     MediaPlayer mediaPlayer;
+
+    Boolean timerActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        textView = findViewById(R.id.textView);
+        editTextHours = findViewById(R.id.editTextHours);
+        editTextMinutes = findViewById(R.id.editTextMinutes);
+        editTextSeconds = findViewById(R.id.editTextSeconds);
+        button = findViewById(R.id.button);
+        textView2 = findViewById(R.id.textView2);
 
-        textView=(TextView) findViewById(R.id.textView);
-        seekBar = (SeekBar)findViewById(R.id.seekBar);
-
-
-        seekBar.setMax(200000);
-
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                updateTimer(progress);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
+        button.setOnClickListener(this::startTimer); // Attach startTimer to the button
     }
 
-    public void resetTimer(){
-        seekBar.setEnabled(true);
-        seekBar.setProgress(12000);
-        updateTimer(12000);
-        button=(Button)findViewById(R.id.button);
+    public void resetTimer() {
+        editTextHours.setEnabled(true);
+        editTextMinutes.setEnabled(true);
+        editTextSeconds.setEnabled(true);
+        updateTimer(0);
         button.setText("Start");
-        timerActive=false;
-        countDownTimer.cancel();
+        timerActive = false;
 
-        mediaPlayer=MediaPlayer.create(getApplicationContext(),R.raw.alert);
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
+        // Play alert sound when timer ends
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alert);
         mediaPlayer.start();
     }
 
-    public void updateTimer(int s){
+    public void updateTimer(int s) {
+        int hours = s / 3600;
+        int minutes = (s % 3600) / 60;
+        int seconds = s % 60;
 
-        int minutes =s/60000;
-        int seconds = (s/1000) - (minutes*60);
-        String secString="";
-        if(seconds<10){
-            secString="0"+seconds;
-        }else {
-            secString=Integer.toString(seconds);
-        }
-
-
-
-        String timeleft = minutes +":"+secString;
-
-        textView.setText(timeleft);
-
+        String timeLeft = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        textView.setText(timeLeft);
     }
-    Boolean timerActive=false;
+
     public void startTimer(View view) {
-//        final MediaPlayer mediaPlayer = MediaPlayer.create(this,R.raw.Beeps18);
-
-
-        textView=(TextView) findViewById(R.id.textView);
-        seekBar = (SeekBar)findViewById(R.id.seekBar);
-        button=(Button)findViewById(R.id.button);
-        textView2=(TextView)findViewById(R.id.textView2);
-
-        if(timerActive){
-
+        if (timerActive) {
             resetTimer();
-
-        }else{
-            timerActive=true;
+        } else {
+            timerActive = true;
             button.setText("Stop");
-            seekBar.setEnabled(false);
-            int timer_set = seekBar.getProgress();
-            countDownTimer=new CountDownTimer(timer_set,1000) {
+
+            // Disable the EditText fields so they can't be changed while the timer is running
+            editTextHours.setEnabled(false);
+            editTextMinutes.setEnabled(false);
+            editTextSeconds.setEnabled(false);
+
+            // Get the values from EditText with a check for empty values
+            int hours = getValueFromEditText(editTextHours);
+            int minutes = getValueFromEditText(editTextMinutes);
+            int seconds = getValueFromEditText(editTextSeconds);
+
+            // Convert the total time to seconds
+            int totalTimeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+            // Start the countdown timer
+            countDownTimer = new CountDownTimer(totalTimeInSeconds * 1000L, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     textView2.setText("");
-                    updateTimer((int) millisUntilFinished);
-
+                    updateTimer((int) (millisUntilFinished / 1000));
                 }
 
                 @Override
                 public void onFinish() {
-
                     textView2.setText("Time Up");
                     resetTimer();
-
                 }
             };
             countDownTimer.start();
+        }
+    }
+
+    // Helper method to get value from EditText, defaults to 0 if empty
+    private int getValueFromEditText(EditText editText) {
+        String text = editText.getText().toString();
+        // If the EditText is empty, return 0, otherwise return the parsed value
+        if (TextUtils.isEmpty(text)) {
+            return 0;
+        } else {
+            return Integer.parseInt(text);
         }
     }
 }
