@@ -104,11 +104,11 @@ public class MainActivity extends AppCompatActivity {
                         int result = mathService.add(5, 10);
                         Log.d("AnkitApp", "Result of addition: " + result);
 
-                        int result = mathService.sub(10, 5);
-                        Log.d("AnkitApp", "Result of Substraction: " + result);
+                        int result2 = mathService.sub(10, 5);
+                        Log.d("AnkitApp", "Result of Substraction: " + result2);
 
-                        int result = mathService.multiply(5, 10);
-                        Log.d("AnkitApp", "Result of Multiplication: " + result);
+                        int result3 = mathService.multiply(5, 10);
+                        Log.d("AnkitApp", "Result of Multiplication: " + result3);
                     } else {
                         Log.e("AnkitApp", "MathService is not accessible!");
                     }
