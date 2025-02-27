@@ -1,0 +1,26 @@
+android_app {
+  name: "CustomTimerPin",
+  certificate: "platform",
+  
+  platform_apis: true,
+  privileged: true,
+
+  srcs: ["app/src/main/java/**/*.java"],
+  resource_dirs: ["app/src/main/res"],
+  manifest: "app/src/main/AndroidManifest.xml",
+
+  overrides: ["Provision"],
+
+  static_libs: [
+    "com.google.android.material_material",
+    "androidx.core_core",
+    "androidx.preference_preference",
+    "androidx.lifecycle_lifecycle-extensions",
+    "androidx-constraintlayout_constraintlayout",
+    "androidx.annotation_annotation",
+    "androidx.appcompat_appcompat",
+  ],
+  libs: [
+    "framework",
+  ],
+}

@@ -1,7 +1,6 @@
 package com.customservice.timer;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -20,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     CountDownTimer countDownTimer;
     TextView textView2;
-    MediaPlayer mediaPlayer;
     private MathServiceManager mathService;
     private static final String TAG = "AnkitApp";
 
@@ -59,9 +57,6 @@ public class MainActivity extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alert);
-        mediaPlayer.start();
     }
 
     public void updateTimer(int s) {
@@ -109,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                         int result = mathService.add(5, 10);
                         Log.d("AnkitApp", "Result of addition: " + result);
 
+                        int result = mathService.sub(10, 5);
+                        Log.d("AnkitApp", "Result of Substraction: " + result);
+
+                        int result = mathService.multiply(5, 10);
+                        Log.d("AnkitApp", "Result of Multiplication: " + result);
                     } else {
                         Log.e("AnkitApp", "MathService is not accessible!");
                     }
